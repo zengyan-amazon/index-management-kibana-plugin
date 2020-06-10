@@ -16,13 +16,13 @@
 import React, { Component } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { EuiSpacer, EuiTitle, EuiButton, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
-import chrome from "ui/chrome";
+// import chrome from "ui/chrome";
 import { IndexService, ManagedIndexService } from "../../../../services";
 import ChangeManagedIndices from "../../components/ChangeManagedIndices";
 import NewPolicy from "../../components/NewPolicy";
 import { BREADCRUMBS } from "../../../../utils/constants";
 import { ManagedIndexItem } from "../../../../../models/interfaces";
-import { toastNotifications } from "ui/notify";
+// import { toastNotifications } from "ui/notify";
 import { getErrorMessage } from "../../../../utils/helpers";
 import { PolicyOption } from "../../models/interfaces";
 
@@ -60,7 +60,8 @@ export default class ChangePolicy extends Component<ChangePolicyProps, ChangePol
   };
 
   async componentDidMount(): Promise<void> {
-    chrome.breadcrumbs.set([BREADCRUMBS.INDEX_MANAGEMENT, BREADCRUMBS.MANAGED_INDICES, BREADCRUMBS.CHANGE_POLICY]);
+    // chrome.breadcrumbs.set([BREADCRUMBS.INDEX_MANAGEMENT, BREADCRUMBS.MANAGED_INDICES, BREADCRUMBS.CHANGE_POLICY]);
+    // use coreStart.chrome.setBreadcrumbs()
   }
 
   onChangeSelectedPolicy = (selectedPolicies: PolicyOption[]): void => {
@@ -108,18 +109,18 @@ export default class ChangePolicy extends Component<ChangePolicyProps, ChangePol
       if (changePolicyResponse.ok) {
         const { updatedIndices, failedIndices, failures } = changePolicyResponse.response;
         if (updatedIndices) {
-          toastNotifications.addSuccess(`Changed policy on ${updatedIndices} indices`);
+          // toastNotifications.addSuccess(`Changed policy on ${updatedIndices} indices`);
         }
         if (failures) {
-          toastNotifications.addDanger(
-            `Failed to change policy on ${failedIndices.map(failedIndex => `[${failedIndex.indexName}, ${failedIndex.reason}]`).join(", ")}`
-          );
+          // toastNotifications.addDanger(
+          //   `Failed to change policy on ${failedIndices.map(failedIndex => `[${failedIndex.indexName}, ${failedIndex.reason}]`).join(", ")}`
+          // );
         }
       } else {
-        toastNotifications.addDanger(changePolicyResponse.error);
+        // toastNotifications.addDanger(changePolicyResponse.error);
       }
     } catch (err) {
-      toastNotifications.addDanger(getErrorMessage(err, "There was a problem changing policy"));
+      // toastNotifications.addDanger(getErrorMessage(err, "There was a problem changing policy"));
     }
   };
 

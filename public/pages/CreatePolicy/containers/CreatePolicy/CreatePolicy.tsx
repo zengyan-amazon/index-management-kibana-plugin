@@ -15,9 +15,9 @@
 
 import React, { ChangeEvent, Component, Fragment } from "react";
 import { EuiSpacer, EuiTitle, EuiFlexGroup, EuiFlexItem, EuiButton, EuiButtonEmpty, EuiCallOut, EuiLink, EuiIcon } from "@elastic/eui";
-import chrome from "ui/chrome";
-import { toastNotifications } from "ui/notify";
-import queryString from "query-string";
+// import chrome from "ui/chrome"; // comment the usage of chrome here, should migrate to coreStart.chrome
+// import { toastNotifications } from "ui/notify";
+import queryString from "querystring";
 import { RouteComponentProps } from "react-router-dom";
 import { DEFAULT_POLICY } from "../../utils/constants";
 import DefinePolicy from "../../components/DefinePolicy";
@@ -60,19 +60,19 @@ export default class CreatePolicy extends Component<CreatePolicyProps, CreatePol
   }
 
   componentDidMount = async (): Promise<void> => {
-    chrome.breadcrumbs.set([BREADCRUMBS.INDEX_MANAGEMENT, BREADCRUMBS.INDEX_POLICIES]);
+    // chrome.breadcrumbs.set([BREADCRUMBS.INDEX_MANAGEMENT, BREADCRUMBS.INDEX_POLICIES]);
     if (this.props.isEdit) {
       const { id } = queryString.parse(this.props.location.search);
       if (typeof id === "string" && !!id) {
-        chrome.breadcrumbs.push(BREADCRUMBS.EDIT_POLICY);
-        chrome.breadcrumbs.push({ text: id });
+        // chrome.breadcrumbs.push(BREADCRUMBS.EDIT_POLICY);
+        // chrome.breadcrumbs.push({ text: id });
         await this.getPolicyToEdit(id);
       } else {
-        toastNotifications.addDanger(`Invalid policy id: ${id}`);
+        // toastNotifications.addDanger(`Invalid policy id: ${id}`);
         this.props.history.push(ROUTES.INDEX_POLICIES);
       }
     } else {
-      chrome.breadcrumbs.push(BREADCRUMBS.CREATE_POLICY);
+      // chrome.breadcrumbs.push(BREADCRUMBS.CREATE_POLICY);
       this.setState({ jsonString: DEFAULT_POLICY });
     }
   };
@@ -89,11 +89,11 @@ export default class CreatePolicy extends Component<CreatePolicyProps, CreatePol
           jsonString: JSON.stringify({ policy: response.response.policy }, null, 4),
         });
       } else {
-        toastNotifications.addDanger(`Could not load the policy: ${response.error}`);
+        // toastNotifications.addDanger(`Could not load the policy: ${response.error}`);
         this.props.history.push(ROUTES.INDEX_POLICIES);
       }
     } catch (err) {
-      toastNotifications.addDanger(getErrorMessage(err, "Could not load the policy"));
+      // toastNotifications.addDanger(getErrorMessage(err, "Could not load the policy"));
       this.props.history.push(ROUTES.INDEX_POLICIES);
     }
   };
@@ -103,7 +103,7 @@ export default class CreatePolicy extends Component<CreatePolicyProps, CreatePol
     try {
       const response = await policyService.putPolicy(policy, policyId);
       if (response.ok) {
-        toastNotifications.addSuccess(`Created policy: ${response.response._id}`);
+        // toastNotifications.addSuccess(`Created policy: ${response.response._id}`);
         this.props.history.push(ROUTES.INDEX_POLICIES);
       } else {
         this.setState({ submitError: response.error });
@@ -118,12 +118,12 @@ export default class CreatePolicy extends Component<CreatePolicyProps, CreatePol
       const { policyService } = this.props;
       const { policyPrimaryTerm, policySeqNo } = this.state;
       if (policySeqNo == null || policyPrimaryTerm == null) {
-        toastNotifications.addDanger("Could not update policy without seqNo and primaryTerm");
+        // toastNotifications.addDanger("Could not update policy without seqNo and primaryTerm");
         return;
       }
       const response = await policyService.putPolicy(policy, policyId, policySeqNo, policyPrimaryTerm);
       if (response.ok) {
-        toastNotifications.addSuccess(`Updated policy: ${response.response._id}`);
+        // toastNotifications.addSuccess(`Updated policy: ${response.response._id}`);
         this.props.history.push(ROUTES.INDEX_POLICIES);
       } else {
         this.setState({ submitError: response.error });
@@ -171,7 +171,7 @@ export default class CreatePolicy extends Component<CreatePolicyProps, CreatePol
         else await this.onCreate(policyId, policy);
       }
     } catch (err) {
-      toastNotifications.addDanger("Invalid Policy JSON");
+      // toastNotifications.addDanger("Invalid Policy JSON");
       console.error(err);
     }
 

@@ -14,7 +14,7 @@
  */
 
 import React, { Component } from "react";
-import { toastNotifications } from "ui/notify";
+// import { toastNotifications } from "ui/notify";
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -29,11 +29,13 @@ import {
 } from "@elastic/eui";
 import { BrowserServices } from "../../../../models/interfaces";
 import { getErrorMessage } from "../../../../utils/helpers";
+import { CoreStart } from "kibana/public";
 
 interface RolloverAliasModalProps {
   onClose: () => void;
   services: BrowserServices;
   index: string;
+  core: CoreStart;
 }
 
 interface RolloverAliasModalState {
@@ -56,16 +58,20 @@ export default class RolloverAliasModal extends Component<RolloverAliasModalProp
       const response = await indexService.editRolloverAlias(index, rolloverAlias);
       if (response.ok) {
         if (response.response.acknowledged) {
-          toastNotifications.addSuccess(`Edited rollover alias on ${index}`);
+          // toastNotifications.addSuccess(`Edited rollover alias on ${index}`);
+          this.props.core.notifications.toasts.addSuccess(`Edited rollover alias on ${index}`);
         } else {
-          toastNotifications.addDanger(`Failed to edit rollover alias on ${index}`);
+          // toastNotifications.addDanger(`Failed to edit rollover alias on ${index}`);
+          this.props.core.notifications.toasts.addDanger(`Failed to edit rollover alias on ${index}`);
         }
       } else {
-        toastNotifications.addDanger(response.error);
+        // toastNotifications.addDanger(response.error);
+        this.props.core.notifications.toasts.addDanger(response.error);
       }
       onClose();
     } catch (err) {
-      toastNotifications.addDanger(getErrorMessage(err, `There was a problem editing rollover alias on ${index}`));
+      // toastNotifications.addDanger(getErrorMessage(err, `There was a problem editing rollover alias on ${index}`));
+      this.props.core.notifications.toasts.addDanger(getErrorMessage(err, `There was a problem editing rollover alias on ${index}`));
     }
   };
 

@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import queryString from "query-string";
+import queryString from "querystring";
 import { IHttpResponse, IHttpService } from "angular";
 import { GetPoliciesResponse, PutPolicyResponse } from "../../server/models/interfaces";
 import { ServerResponse } from "../../server/models/types";

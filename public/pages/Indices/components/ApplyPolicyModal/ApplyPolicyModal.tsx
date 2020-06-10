@@ -14,7 +14,7 @@
  */
 
 import React, { Component, Fragment } from "react";
-import { toastNotifications } from "ui/notify";
+// import { toastNotifications } from "ui/notify";
 import _ from "lodash";
 import {
   EuiButton,
@@ -86,22 +86,22 @@ export default class ApplyPolicyModal extends Component<ApplyPolicyModalProps, A
       if (applyPolicyResponse.ok) {
         const { updatedIndices, failedIndices, failures } = applyPolicyResponse.response;
         if (updatedIndices) {
-          toastNotifications.addSuccess(`Applied policy to ${updatedIndices} indices`);
+          // toastNotifications.addSuccess(`Applied policy to ${updatedIndices} indices`);
           if (hasRolloverAction && rolloverAlias && indices.length === 1) {
             await this.onEditRolloverAlias(indices[0], rolloverAlias);
           }
         }
         if (failures) {
-          toastNotifications.addDanger(
-            `Failed to apply policy to ${failedIndices.map(failedIndex => `[${failedIndex.indexName}, ${failedIndex.reason}]`).join(", ")}`
-          );
+          // toastNotifications.addDanger(
+          //   `Failed to apply policy to ${failedIndices.map(failedIndex => `[${failedIndex.indexName}, ${failedIndex.reason}]`).join(", ")}`
+          // );
         }
         onClose();
       } else {
-        toastNotifications.addDanger(applyPolicyResponse.error);
+        // toastNotifications.addDanger(applyPolicyResponse.error);
       }
     } catch (err) {
-      toastNotifications.addDanger(getErrorMessage(err, "There was a problem adding policy to indices"));
+      // toastNotifications.addDanger(getErrorMessage(err, "There was a problem adding policy to indices"));
     }
   };
 
@@ -113,15 +113,15 @@ export default class ApplyPolicyModal extends Component<ApplyPolicyModalProps, A
       const response = await indexService.editRolloverAlias(index, rolloverAlias);
       if (response.ok) {
         if (response.response.acknowledged) {
-          toastNotifications.addSuccess(`Edited rollover alias on ${index}`);
+          // toastNotifications.addSuccess(`Edited rollover alias on ${index}`);
         } else {
-          toastNotifications.addDanger(`Failed to edit rollover alias on ${index}`);
+          // toastNotifications.addDanger(`Failed to edit rollover alias on ${index}`);
         }
       } else {
-        toastNotifications.addDanger(response.error);
+        // toastNotifications.addDanger(response.error);
       }
     } catch (err) {
-      toastNotifications.addDanger(getErrorMessage(err, `There was a problem editing rollover alias on ${index}`));
+      // toastNotifications.addDanger(getErrorMessage(err, `There was a problem editing rollover alias on ${index}`));
     }
   };
 
@@ -140,13 +140,13 @@ export default class ApplyPolicyModal extends Component<ApplyPolicyModalProps, A
         this.setState({ policyOptions: policies });
       } else {
         if (searchPoliciesResponse.error.startsWith("[index_not_found_exception]")) {
-          toastNotifications.addDanger("You have not created a policy yet");
+          // toastNotifications.addDanger("You have not created a policy yet");
         } else {
-          toastNotifications.addDanger(searchPoliciesResponse.error);
+          // toastNotifications.addDanger(searchPoliciesResponse.error);
         }
       }
     } catch (err) {
-      toastNotifications.addDanger(err.message);
+      // toastNotifications.addDanger(err.message);
     }
 
     this.setState({ isLoading: false });
@@ -195,7 +195,7 @@ export default class ApplyPolicyModal extends Component<ApplyPolicyModalProps, A
   getSelectedPolicyError = (selectedPolicy: PolicyOption | null): string => (selectedPolicy ? "" : "You must select a policy");
 
   hasRolloverAction = (selectedPolicy: PolicyOption | null): boolean =>
-    _.get(selectedPolicy, "policy.states", []).some((state: State) => state.actions.some(action => action.hasOwnProperty("rollover")));
+    _.get(selectedPolicy, "policy.states", []).some((state: State) => state.actions.some((action) => action.hasOwnProperty("rollover")));
 
   renderRollover = (): React.ReactNode | null => {
     const { rolloverAlias, hasRolloverAction, rolloverAliasError, hasSubmitted } = this.state;
@@ -211,8 +211,7 @@ export default class ApplyPolicyModal extends Component<ApplyPolicyModalProps, A
           helpText={
             <EuiText size="xs" grow={false}>
               <p>
-                This policy includes a rollover action.
-                Specify a rollover alias.{" "}
+                This policy includes a rollover action. Specify a rollover alias.{" "}
                 <EuiLink href={DOCUMENTATION_URL} target="_blank">
                   Learn more <EuiIcon type="popout" size="s" />
                 </EuiLink>
@@ -253,7 +252,7 @@ export default class ApplyPolicyModal extends Component<ApplyPolicyModalProps, A
     const { selectedPolicy } = this.state;
     if (!selectedPolicy) return null;
 
-    let policyString = '';
+    let policyString = "";
     try {
       policyString = JSON.stringify({ policy: selectedPolicy.policy }, null, 4);
     } catch (err) {
@@ -267,7 +266,9 @@ export default class ApplyPolicyModal extends Component<ApplyPolicyModalProps, A
     return (
       <Fragment>
         <EuiText size="xs" grow={false}>
-          <p><strong>Preview</strong></p>
+          <p>
+            <strong>Preview</strong>
+          </p>
         </EuiText>
         <EuiSpacer size="s" />
         <EuiCodeBlock language="json" fontSize="m" style={{ height: "200px" }}>
@@ -294,17 +295,11 @@ export default class ApplyPolicyModal extends Component<ApplyPolicyModalProps, A
           <EuiModalBody>
             <EuiText size="xs" grow={false}>
               <p>
-                Choose the policy you want to use for the selected indices.
-                A copy of the policy will be created and applied to the indices.
+                Choose the policy you want to use for the selected indices. A copy of the policy will be created and applied to the indices.
               </p>
             </EuiText>
             <EuiSpacer size="m" />
-            <EuiFormRow
-              label="Policy ID"
-              isInvalid={hasSubmitted && !!selectedPolicyError}
-              error={selectedPolicyError}
-              fullWidth
-            >
+            <EuiFormRow label="Policy ID" isInvalid={hasSubmitted && !!selectedPolicyError} error={selectedPolicyError} fullWidth>
               <EuiComboBox
                 placeholder="Search policies"
                 async

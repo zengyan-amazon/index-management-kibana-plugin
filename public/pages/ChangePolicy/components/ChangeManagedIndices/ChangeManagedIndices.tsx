@@ -15,7 +15,8 @@
 
 import React, { Component } from "react";
 import { EuiSpacer, EuiComboBox, EuiFormRow } from "@elastic/eui";
-import { toastNotifications } from "ui/notify";
+// comment toastNotifications here, should migrate to coreStart.notification.toast
+// import { toastNotifications } from "ui/notify";
 import { ContentPanel } from "../../../../components/ContentPanel";
 import { ManagedIndexService } from "../../../../services";
 import { ManagedIndexItem, State } from "../../../../../models/interfaces";
@@ -62,13 +63,13 @@ export default class ChangeManagedIndices extends Component<ChangeManagedIndices
         this.setState({ managedIndices: options.concat(managedIndices) });
       } else {
         if (managedIndicesResponse.error.startsWith("[index_not_found_exception]")) {
-          toastNotifications.addDanger("You have not created a managed index yet");
+          // toastNotifications.addDanger("You have not created a managed index yet");
         } else {
-          toastNotifications.addDanger(managedIndicesResponse.error);
+          // toastNotifications.addDanger(managedIndicesResponse.error);
         }
       }
     } catch (err) {
-      toastNotifications.addDanger(err.message);
+      // toastNotifications.addDanger(err.message);
     }
 
     this.setState({ managedIndicesIsLoading: false });

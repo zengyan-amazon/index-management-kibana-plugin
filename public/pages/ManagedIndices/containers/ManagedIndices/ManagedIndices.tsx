@@ -14,8 +14,8 @@
  */
 
 import React, { Component } from "react";
-import { toastNotifications } from "ui/notify";
-import chrome from "ui/chrome";
+// import { toastNotifications } from "ui/notify";
+// import chrome from "ui/chrome";
 import { RouteComponentProps } from "react-router-dom";
 import {
   EuiBasicTable,
@@ -35,7 +35,7 @@ import {
   Pagination,
   EuiTableSelectionType,
 } from "@elastic/eui";
-import queryString from "query-string";
+import queryString from "querystring";
 import _ from "lodash";
 import { ContentPanel, ContentPanelActions } from "../../../../components/ContentPanel";
 import ManagedIndexControls from "../../components/ManagedIndexControls";
@@ -52,9 +52,11 @@ import { getErrorMessage } from "../../../../utils/helpers";
 import ConfirmationModal from "../../../../components/ConfirmationModal";
 import RetryModal from "../../components/RetryModal";
 import RolloverAliasModal from "../../components/RolloverAliasModal";
+import { CoreStart } from "kibana/public";
 
 interface ManagedIndicesProps extends RouteComponentProps {
   managedIndexService: ManagedIndexService;
+  core: CoreStart;
 }
 
 interface ManagedIndicesState {
@@ -161,7 +163,8 @@ export default class ManagedIndices extends Component<ManagedIndicesProps, Manag
   }
 
   async componentDidMount() {
-    chrome.breadcrumbs.set([BREADCRUMBS.INDEX_MANAGEMENT, BREADCRUMBS.MANAGED_INDICES]);
+    // chrome.breadcrumbs.set([BREADCRUMBS.INDEX_MANAGEMENT, BREADCRUMBS.MANAGED_INDICES]);
+    this.props.core.chrome.setBreadcrumbs([BREADCRUMBS.INDEX_MANAGEMENT, BREADCRUMBS.MANAGED_INDICES]);
     await this.getManagedIndices();
   }
 
@@ -217,10 +220,12 @@ export default class ManagedIndices extends Component<ManagedIndicesProps, Manag
         } = getManagedIndicesResponse;
         this.setState({ managedIndices, totalManagedIndices });
       } else {
-        toastNotifications.addDanger(getManagedIndicesResponse.error);
+        // toastNotifications.addDanger(getManagedIndicesResponse.error);
+        this.props.core.notifications.toasts.addDanger(getManagedIndicesResponse.error);
       }
     } catch (err) {
-      toastNotifications.addDanger(getErrorMessage(err, "There was a problem loading the managed indices"));
+      // toastNotifications.addDanger(getErrorMessage(err, "There was a problem loading the managed indices"));
+      this.props.core.notifications.toasts.addDanger(getErrorMessage(err, "There was a problem loading the managed indices"));
     }
     this.setState({ loadingManagedIndices: false });
   };
@@ -233,20 +238,28 @@ export default class ManagedIndices extends Component<ManagedIndicesProps, Manag
       if (removePolicyResponse.ok) {
         const { updatedIndices, failedIndices, failures } = removePolicyResponse.response;
         if (updatedIndices) {
-          toastNotifications.addSuccess(`Removed policy from ${updatedIndices} managed indices`);
+          // toastNotifications.addSuccess(`Removed policy from ${updatedIndices} managed indices`);
+          this.props.core.notifications.toasts.addSuccess(`Removed policy from ${updatedIndices} managed indices`);
         }
         if (failures) {
-          toastNotifications.addDanger(
+          // toastNotifications.addDanger(
+          //   `Failed to remove policy from ${failedIndices
+          //     .map(failedIndex => `[${failedIndex.indexName}, ${failedIndex.reason}]`)
+          //     .join(", ")}`
+          // );
+          this.props.core.notifications.toasts.addDanger(
             `Failed to remove policy from ${failedIndices
-              .map(failedIndex => `[${failedIndex.indexName}, ${failedIndex.reason}]`)
+              .map((failedIndex) => `[${failedIndex.indexName}, ${failedIndex.reason}]`)
               .join(", ")}`
           );
         }
       } else {
-        toastNotifications.addDanger(removePolicyResponse.error);
+        // toastNotifications.addDanger(removePolicyResponse.error);
+        this.props.core.notifications.toasts.addDanger(removePolicyResponse.error);
       }
     } catch (err) {
-      toastNotifications.addDanger(getErrorMessage(err, "There was a problem removing the policies"));
+      // toastNotifications.addDanger(getErrorMessage(err, "There was a problem removing the policies"));
+      this.props.core.notifications.toasts.addDanger(getErrorMessage(err, "There was a problem removing the policies"));
     }
   };
 
@@ -329,6 +342,7 @@ export default class ManagedIndices extends Component<ManagedIndicesProps, Manag
           onClickModal: (onShow: (component: any, props: object) => void) => () =>
             onShow(RolloverAliasModal, {
               index: selectedItems[0].index,
+              core: this.props.core,
             }),
         },
       },
@@ -345,7 +359,7 @@ export default class ManagedIndices extends Component<ManagedIndicesProps, Manag
                 selectedItems.length === 1 ? `policy from ${selectedItems[0].index}` : `policies from ${selectedItems.length} indices`
               } permanently? This action cannot be undone.`,
               actionMessage: "Remove",
-              onAction: () => this.onClickRemovePolicy(selectedItems.map(item => item.index)),
+              onAction: () => this.onClickRemovePolicy(selectedItems.map((item) => item.index)),
             }),
         },
       },
