@@ -13,37 +13,41 @@
  * permissions and limitations under the License.
  */
 
-import { IHttpResponse, IHttpService } from "angular";
+// import { IHttpResponse, IHttpService } from "angular";
 import { INDEX } from "../../server/utils/constants";
 import { AcknowledgedResponse, ApplyPolicyResponse, GetIndicesResponse, SearchResponse } from "../../server/models/interfaces";
 import { ServerResponse } from "../../server/models/types";
 import { NODE_API } from "../../utils/constants";
+import { HttpSetup, HttpResponse } from "kibana/public";
 
 export default class IndexService {
-  httpClient: IHttpService;
+  httpClient: HttpSetup;
 
-  constructor(httpClient: IHttpService) {
+  constructor(httpClient: HttpSetup) {
     this.httpClient = httpClient;
+    this.httpClient.post("url", { body: "" });
   }
 
   getIndices = async (queryParamsString: string): Promise<ServerResponse<GetIndicesResponse>> => {
     const url = `..${NODE_API._INDICES}?${queryParamsString}`;
-    const response = (await this.httpClient.get(url)) as IHttpResponse<ServerResponse<GetIndicesResponse>>;
-    return response.data;
+    const response = (await this.httpClient.get(url)) as HttpResponse<ServerResponse<GetIndicesResponse>>;
+    return response.body!;
   };
 
   applyPolicy = async (indices: string[], policyId: string): Promise<ServerResponse<ApplyPolicyResponse>> => {
     const body = { indices, policyId };
     const url = `..${NODE_API.APPLY_POLICY}`;
-    const response = (await this.httpClient.post(url, body)) as IHttpResponse<ServerResponse<ApplyPolicyResponse>>;
-    return response.data;
+    const response = (await this.httpClient.post(url, { body: JSON.stringify(body) })) as HttpResponse<ServerResponse<ApplyPolicyResponse>>;
+    return response.body!;
   };
 
   editRolloverAlias = async (index: string, alias: string): Promise<ServerResponse<AcknowledgedResponse>> => {
     const body = { index, alias };
     const url = `..${NODE_API.EDIT_ROLLOVER_ALIAS}`;
-    const response = (await this.httpClient.post(url, body)) as IHttpResponse<ServerResponse<AcknowledgedResponse>>;
-    return response.data;
+    const response = (await this.httpClient.post(url, { body: JSON.stringify(body) })) as HttpResponse<
+      ServerResponse<AcknowledgedResponse>
+    >;
+    return response.body!;
   };
 
   searchPolicies = async (searchValue: string, source: boolean = false): Promise<ServerResponse<SearchResponse<any>>> => {
@@ -51,10 +55,7 @@ export default class IndexService {
       query_string: {
         default_field: "policy.policy_id",
         default_operator: "AND",
-        query: `*${searchValue
-          .trim()
-          .split(" ")
-          .join("* *")}*`,
+        query: `*${searchValue.trim().split(" ").join("* *")}*`,
       },
     };
     const body = {
@@ -63,7 +64,7 @@ export default class IndexService {
       query: { _source: source, query: { bool: { must: [mustQuery, { exists: { field: "policy" } }] } } },
     };
     const url = `..${NODE_API._SEARCH}`;
-    const response = (await this.httpClient.post(url, body)) as IHttpResponse<ServerResponse<any>>;
-    return response.data;
+    const response = (await this.httpClient.post(url, { body: JSON.stringify(body) })) as HttpResponse<ServerResponse<any>>;
+    return response.body!;
   };
 }
